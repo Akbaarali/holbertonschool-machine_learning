@@ -8,8 +8,8 @@ import pandas as pd
 
 
 def concat(df1, df2):
-    """Concatenate df2 on top of df1 using Timestamp as index."""
-    index = __import__("10-index").index
+    """Concatenate selected df2 rows on top of df1 using Timestamp as index."""
+    index = __import__('10-index').index
 
     df1 = index(df1)
     df2 = index(df2)
