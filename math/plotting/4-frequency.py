@@ -1,17 +1,9 @@
 #!/usr/bin/env python3
-"""
-4-frequency.py
-Plots a histogram of student grades.
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 def frequency():
-    """
-    Plots a histogram showing the frequency of student grades.
-    """
     np.random.seed(5)
     student_grades = np.random.normal(68, 15, 50)
 
