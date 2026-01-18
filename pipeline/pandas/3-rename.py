@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """
 Task 3: Rename
-Renames Timestamp to Datetime, converts it to datetime, and keeps Datetime/Close.
+
+Rename Timestamp to Datetime, convert it to datetime, and keep
+only Datetime and Close.
 """
 
 import pandas as pd
 
 
 def rename(df):
-    """Modify df by renaming Timestamp to Datetime, converting it, and selecting columns."""
+    """
+    Rename Timestamp to Datetime, convert it to datetime, and keep
+    only Datetime and Close columns.
+    """
     df = df.rename(columns={"Timestamp": "Datetime"})
 
     if pd.api.types.is_numeric_dtype(df["Datetime"]):
