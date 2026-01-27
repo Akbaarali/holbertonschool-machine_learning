@@ -1,37 +1,36 @@
 #!/usr/bin/env python3
-"""Defines a function that computes the integral of a polynomial."""
+"""Module that defines the integral of a polynomial."""
 
 
 def poly_integral(poly, c=0):
-    """Return the integral of a polynomial.
+    """Calculate the integral of a polynomial.
 
-    poly is a list where index represents the power of x.
-    c is the integration constant (must be an int).
+    Args:
+        poly (list): list of coefficients where index = power of x
+        c (int): integration constant
 
-    If poly or c is invalid, return None.
-    Coefficients that are whole numbers must be stored as ints.
-    The returned list should be as small as possible.
+    Returns:
+        list: coefficients of the integrated polynomial
+        None: if poly or c is invalid
     """
-    if type(poly) is not list or len(poly) == 0:
+    if not isinstance(poly, list) or len(poly) == 0:
         return None
-    if type(c) is not int:
+    if not isinstance(c, int):
         return None
 
-    for coeff in poly:
-        if type(coeff) not in (int, float):
+    for coef in poly:
+        if not isinstance(coef, (int, float)):
             return None
 
-    integ = [c]
+    result = [c]
 
-    for i, coeff in enumerate(poly):
-        new_coeff = coeff / (i + 1)
+    for i, coef in enumerate(poly):
+        value = coef / (i + 1)
+        if isinstance(value, float) and value.is_integer():
+            value = int(value)
+        result.append(value)
 
-        if type(new_coeff) is float and new_coeff.is_integer():
-            new_coeff = int(new_coeff)
+    while len(result) > 1 and result[-1] == 0:
+        result.pop()
 
-        integ.append(new_coeff)
-
-    while len(integ) > 1 and integ[-1] == 0:
-        integ.pop()
-
-    return integ
+    return result
