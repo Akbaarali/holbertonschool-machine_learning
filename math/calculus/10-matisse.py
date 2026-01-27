@@ -16,8 +16,9 @@ def poly_derivative(poly):
     for c in poly:
         if type(c) not in (int, float):
             return None
+    # derivative: d/dx sum_{i=0}^n poly[i] * x^i
+    # equals sum_{i=1}^n i * poly[i] * x^(i-1)
 
-    # derivative: d/dx sum_{i=0}^n poly[i] * x^i = sum_{i=1}^n i*poly[i] * x^(i-1)
     deriv = []
     for i in range(1, len(poly)):
         deriv.append(poly[i] * i)
