@@ -6,9 +6,10 @@ def poly_integral(poly, c=0):
     """Return the integral of a polynomial.
 
     poly is a list where index represents the power of x.
-    c is the integration constant.
+    c is the integration constant (must be an int).
 
     If poly or c is invalid, return None.
+    Coefficients that are whole numbers must be stored as ints.
     The returned list should be as small as possible.
     """
     if type(poly) is not list or len(poly) == 0:
@@ -21,16 +22,15 @@ def poly_integral(poly, c=0):
             return None
 
     integ = [c]
+
     for i, coeff in enumerate(poly):
         new_coeff = coeff / (i + 1)
 
-        # If the result is a whole number, store it as int
         if type(new_coeff) is float and new_coeff.is_integer():
             new_coeff = int(new_coeff)
 
         integ.append(new_coeff)
 
-    # Make the list as small as possible (remove trailing zeros)
     while len(integ) > 1 and integ[-1] == 0:
         integ.pop()
 
