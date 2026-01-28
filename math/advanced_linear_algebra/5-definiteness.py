@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Definiteness of a matrix (positive/negative definite/semi-definite/indefinite)."""
+"""Definiteness of a matrix.
+
+Classifies a matrix as positive/negative (semi-)definite or indefinite.
+"""
+
 
 import numpy as np
 
