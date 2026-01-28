@@ -1,36 +1,39 @@
 #!/usr/bin/env python3
-"""Module that defines the integral of a polynomial."""
+"""
+Task 17 - Integrate
+"""
 
 
-def poly_integral(poly, c=0):
-    """Calculate the integral of a polynomial.
+def poly_integral(poly, C=0):
+    """
+    Calculates the integral of a polynomial.
 
-    Args:
-        poly (list): list of coefficients where index = power of x
-        c (int): integration constant
+    poly: list of coefficients where index = power of x
+    C: integer integration constant
 
     Returns:
-        list: coefficients of the integrated polynomial
-        None: if poly or c is invalid
+        New list of coefficients representing the integral, or None if invalid.
     """
     if not isinstance(poly, list) or len(poly) == 0:
         return None
-    if not isinstance(c, int):
+    if not isinstance(C, int):
         return None
 
-    for coef in poly:
-        if not isinstance(coef, (int, float)):
+    # poly must contain only ints
+    for a in poly:
+        if not isinstance(a, int):
             return None
 
-    result = [c]
+    integ = [C]
 
-    for i, coef in enumerate(poly):
-        value = coef / (i + 1)
-        if isinstance(value, float) and value.is_integer():
-            value = int(value)
-        result.append(value)
+    for i, a in enumerate(poly):
+        val = a / (i + 1)
+        if val.is_integer():
+            val = int(val)
+        integ.append(val)
 
-    while len(result) > 1 and result[-1] == 0:
-        result.pop()
+    # make list as small as possible (trim trailing zeros)
+    while len(integ) > 1 and integ[-1] == 0:
+        integ.pop()
 
-    return result
+    return integ
