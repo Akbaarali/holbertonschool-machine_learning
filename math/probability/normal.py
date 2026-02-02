@@ -24,3 +24,21 @@ class Normal:
             self.mean = sum(data) / len(data)
             variance = sum((x - self.mean) ** 2 for x in data) / len(data)
             self.stddev = variance ** 0.5
+
+    def z_score(self, x):
+        """
+        Docstring for z_score
+        
+        :param self: Description
+        :param x: Description
+        """
+        return (x - self.mean) / self.stddev
+    
+    def x_score(self, z):
+        """
+        Docstring for x_score
+        
+        :param self: Description
+        :param z: Description
+        """
+        return z * self.stddev + self.mean
