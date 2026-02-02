@@ -39,14 +39,18 @@ class Poisson:
         e_term = 2.7182818285 ** (-self.lambtha)
         return (e_term * (self.lambtha ** k)) / factorial
 
+    def cdf(self, k):
+        """
+        Calculates the value of the CDF for a given number of successes
+        """
+        if not isinstance(k, int):
+            k = int(k)
 
-    def cdf(self,k):
-        if not isinstance(k,int):
-            k=int(k)
-        if k<0:
+        if k < 0:
             return 0
-        cem=0
-        for i in range(0,k+1):
-            cem+=self.pmf(i)
-            
-        return cem
+
+        cdf_sum = 0
+        for i in range(0, k + 1):
+            cdf_sum += self.pmf(i)
+
+        return cdf_sum
