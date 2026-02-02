@@ -34,7 +34,7 @@ class Normal:
         """
         return (x - self.mean) / self.stddev
     
-    def x_score(self, z):
+    def x_value(self, z):
         """
         Docstring for x_score
         
