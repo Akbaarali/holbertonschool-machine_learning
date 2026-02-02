@@ -27,17 +27,15 @@ class Normal:
 
     def z_score(self, x):
         """
-        Docstring for z_score
-        
+        Docstring for z_score      
         :param self: Description
         :param x: Description
         """
         return (x - self.mean) / self.stddev
-    
+
     def x_value(self, z):
         """
         Docstring for x_score
-        
         :param self: Description
         :param z: Description
         """
