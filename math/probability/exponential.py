@@ -43,4 +43,5 @@ class Exponential:
     def cdf(self, x):
         if x < 0:
             return 0
-        return 1 - e^(-self.lambtha * x)
+        e_term = 2.7182818285 ** (-self.lambtha * x)
+        return 1 - e_term
