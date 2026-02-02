@@ -12,14 +12,6 @@ class Exponential:
     def __init__(self, data=None, lambtha=1.):
         """
         Initializes an Exponential distribution.
-
-        Args:
-            data (list): List of data to estimate the distribution.
-            lambtha (float): Expected number of occurrences in a given time frame.
-
-        Raises:
-            TypeError: If data is not a list.
-            ValueError: If lambtha is not positive or data has fewer than 2 values.
         """
         if data is None:
             if lambtha <= 0:
