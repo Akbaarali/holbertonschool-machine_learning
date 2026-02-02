@@ -27,7 +27,7 @@ class Normal:
 
     def z_score(self, x):
         """
-        Docstring for z_score      
+        Docstring for z_score
         :param self: Description
         :param x: Description
         """
