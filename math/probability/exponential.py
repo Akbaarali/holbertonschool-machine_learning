@@ -21,17 +21,17 @@ class Exponential:
             mean = sum(data) / len(data)
             self.lambtha = float(1 / mean)
 
-def pdf(self, x):
-    """
-    Calculates the probability density function for a given time period.
+    def pdf(self, x):
+        """
+        Calculates the probability density function for a given time period.
 
-    Args:
-        x (float): Time period.
+        Args:
+            x (float): Time period.
 
-    Returns:
-        float: The PDF value at x.
-    """
-        if x < 0:
-            return 0
-        e_term = 2.7182818285 ** (-self.lambtha * x)
-        return e_term * self.lambtha
+        Returns:
+            float: The PDF value at x.
+        """
+            if x < 0:
+                return 0
+            e_term = 2.7182818285 ** (-self.lambtha * x)
+            return e_term * self.lambtha
