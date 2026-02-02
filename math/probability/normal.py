@@ -3,9 +3,10 @@
 This module defines the normal distribution class.
 """
 
+
 class Normal:
     """Represents an normal distribution."""
-    
+
     def __init__(self, data=None, mean=0., stddev=1.):
         """
         Initializes a normal distribution.
