@@ -42,6 +42,13 @@ class Normal:
         return z * self.stddev + self.mean
     
     def pdf(self, x):
-        pi = 3.1415926536
-        exponent = -((x - self.mean) / (2 * self.stddev)) ** 2
-        return (1 / (self.stddev * (2 * pi) ** 0.5)) * (2.7182818285 ** exponent)
+        """
+        Docstring for pdf
+        :param self: Description
+        :param x: Description
+        """
+        pi = 3.141592653589793
+        e = 2.718281828459045
+        z = (x - self.mean) / self.stddev
+        exponent = -0.5 * (z ** 2)
+        return (1 / (self.stddev * (2 * pi) ** 0.5 )) * (e ** exponent)
