@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-
+"""
+This module defines the Exponential distribution class.
+"""
 class Exponential:
     """Represents an exponential distribution"""
 
