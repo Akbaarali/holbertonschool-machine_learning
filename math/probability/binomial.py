@@ -1,79 +1,54 @@
 #!/usr/bin/env python3
 """
-Normal distribution
+Binomial distribution
 """
 
 
-class Normal:
-    """Class representing a normal distribution"""
+class Binomial:
+    """Class representing a Binomial distribution"""
 
-    def __init__(self, data=None, mean=0., stddev=1.):
-        """Create a Normal distribution."""
+    def __init__(self, data=None, n=1, p=0.5):
+        """Create a Binomial distribution"""
         if data is None:
-            if stddev <= 0:
-                raise ValueError("stddev must be a positive value")
-            self.mean = float(mean)
-            self.stddev = float(stddev)
+            if n <= 0:
+                raise ValueError("n must be a positive value")
+            if p <= 0 or p >= 1:
+                raise ValueError("p must be greater than 0 and less than 1")
+            self.n = int(n)
+            self.p = float(p)
         else:
             if not isinstance(data, list):
                 raise TypeError("data must be a list")
             if len(data) < 2:
                 raise ValueError("data must contain multiple values")
 
-            n = len(data)
-            mu = sum(data) / n
+            mean = sum(data) / len(data)
+            var = sum((x - mean) ** 2 for x in data) / len(data)
 
-            # Holberton expects population variance (divide by n)
-            var = 0
-            for x in data:
-                var += (x - mu) ** 2
-            var = var / n
+            p_est = 1.0 - (var / mean)
+            n_est = round(mean / p_est)
+            p_est = mean / n_est
 
-            self.mean = float(mu)
-            self.stddev = float(var ** 0.5)
+            self.n = int(n_est)
+            self.p = float(p_est)
 
-    def z_score(self, x):
-        """Return z-score of x."""
-        return (x - self.mean) / self.stddev
+    def pmf(self, k):
+        """Return PMF value for k successes"""
+        k = int(k)
 
-    def x_value(self, z):
-        """Return x-value of z."""
-        return z * self.stddev + self.mean
+        if k < 0 or k > self.n:
+            return 0
 
-    def pdf(self, x):
-        """Return PDF value at x."""
-        pi = 3.1415926536
-        e = 2.7182818285
+        n = self.n
+        p = self.p
 
-        z = (x - self.mean) / self.stddev
-        denom = self.stddev * ((2 * pi) ** 0.5)
-        expo = e ** (-0.5 * (z ** 2))
-        return (1 / denom) * expo
+        if k > n - k:
+            k = n - k
 
-    def cdf(self, x):
-        """Return CDF value at x."""
-        # Uses erf approximation (no modules)
-        pi = 3.1415926536
-        e = 2.7182818285
+        comb = 1
+        i = 1
+        while i <= k:
+            comb = comb * (n - k + i) / i
+            i += 1
 
-        sqrt2 = 2 ** 0.5
-        t = (x - self.mean) / (self.stddev * sqrt2)
-
-        sign = 1
-        if t < 0:
-            sign = -1
-            t = -t
-
-        a1 = 0.254829592
-        a2 = -0.284496736
-        a3 = 1.421413741
-        a4 = -1.453152027
-        a5 = 1.061405429
-        p = 0.3275911
-
-        u = 1.0 / (1.0 + p * t)
-        poly = (((((a5 * u + a4) * u + a3) * u + a2) * u + a1) * u)
-        erf_val = 1.0 - poly * (e ** (-(t * t)))
-        erf_val *= sign
-
-        return 0.5 * (1.0 + erf_val)
+        return comb * (p ** k) * ((1 - p) ** (n - k))
