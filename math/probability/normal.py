@@ -52,3 +52,13 @@ class Normal:
         z = (x - self.mean) / self.stddev
         exponent = -0.5 * (z ** 2)
         return (1 / (self.stddev * (2 * pi) ** 0.5)) * (e ** exponent)
+    
+    def cdf (self, x):
+        """_summary_
+        Args:
+            x (_type_): _description_
+        """
+        pi = 3.1415926536
+        z = (x - self.mean) / (self.stddev * (2**0.5))
+        erf = (2 / (pi ** 0.5)) * (x - ((z ** 3) / 3) + ((z ** 5) / 10) - ((z ** 7) / 42) +((x ** 9) / 216))
+        return 0.5 * (1 + erf)
