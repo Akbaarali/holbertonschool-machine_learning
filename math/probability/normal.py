@@ -3,6 +3,7 @@
 Normal distribution
 """
 
+
 class Normal:
     """Class representing a Normal distribution"""
 
