@@ -1,64 +1,59 @@
 #!/usr/bin/env python3
 """
-This module defines the normal distribution class.
+Normal distribution module
 """
 
 
 class Normal:
-    """Represents an normal distribution."""
+    """Class representing a Normal distribution"""
 
     def __init__(self, data=None, mean=0., stddev=1.):
-        """
-        Initializes a normal distribution.
-        """
         if data is None:
-            if stddev <= 0:
-                raise ValueError("stddev must be a positive value")
             self.mean = float(mean)
             self.stddev = float(stddev)
         else:
             if not isinstance(data, list):
                 raise TypeError("data must be a list")
-            if len(data) <= 2:
+            if len(data) < 2:
                 raise ValueError("data must contain multiple values")
+
             self.mean = sum(data) / len(data)
             variance = sum((x - self.mean) ** 2 for x in data) / len(data)
             self.stddev = variance ** 0.5
 
-    def z_score(self, x):
-        """
-        Docstring for z_score
-        :param self: Description
-        :param x: Description
-        """
-        return (x - self.mean) / self.stddev
-
-    def x_value(self, z):
-        """
-        Docstring for x_score
-        :param self: Description
-        :param z: Description
-        """
-        return z * self.stddev + self.mean
-
     def pdf(self, x):
-        """
-        Docstring for pdf
-        :param self: Description
-        :param x: Description
-        """
         pi = 3.141592653589793
-        e = 2.718281828459045
-        z = (x - self.mean) / self.stddev
-        exponent = -0.5 * (z ** 2)
-        return (1 / (self.stddev * (2 * pi) ** 0.5)) * (e ** exponent)
-    
-    def cdf (self, x):
-        """_summary_
-        Args:
-            x (_type_): _description_
+        return (
+            1 / (self.stddev * (2 * pi) ** 0.5)
+            * (2.718281828459045 ** (
+                -0.5 * ((x - self.mean) / self.stddev) ** 2
+            ))
+        )
+
+    def cdf(self, x):
         """
-        pi = 3.1415926536
-        z = (x - self.mean) / (self.stddev * (2**0.5))
-        erf = (2 / (pi ** 0.5)) * (x - ((z ** 3) / 3) + ((z ** 5) / 10) - ((z ** 7) / 42) +((x ** 9) / 216))
-        return 0.5 * (1 + erf)
+        Calculates the CDF of x without imports
+        """
+        # constants
+        p = 0.3275911
+        a1 = 0.254829592
+        a2 = -0.284496736
+        a3 = 1.421413741
+        a4 = -1.453152027
+        a5 = 1.061405429
+
+        z = (x - self.mean) / (self.stddev * (2 ** 0.5))
+        sign = 1
+        if z < 0:
+            sign = -1
+            z = -z
+
+        t = 1 / (1 + p * z)
+
+        erf = 1 - (
+            (((((a5 * t + a4) * t + a3) * t + a2) * t + a1)
+             * t)
+            * (2.718281828459045 ** (-z * z))
+        )
+
+        return 0.5 * (1 + sign * erf)
