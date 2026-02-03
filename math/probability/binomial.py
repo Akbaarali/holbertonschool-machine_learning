@@ -35,7 +35,7 @@ class Binomial:
 
             # sample mean
             mean = sum(data) / len(data)
-            # sample variance (population variance formula required by project style)
+            # sample variance
             var = sum((x - mean) ** 2 for x in data) / len(data)
             p_est = 1.0 - (var / mean)
             n_est = round(mean / p_est)
