@@ -53,6 +53,17 @@ class Normal:
         exponent = -0.5 * (z ** 2)
         return (1 / (self.stddev * (2 * pi) ** 0.5)) * (e ** exponent)
 
+    def erf(x):
+        """_summary_
+        Args:
+            x (_type_): _description_
+        Returns:
+            _type_: _description_
+        """
+        pi = 3.1415926536
+        res = float((2 / (pi ** 0.5)) * (x - ((x ** 3) / 3) + ((x ** 5) / 10) - ((x ** 7) / 42) + ((x ** 9) / 216)))
+        return res
+
     def cdf (self, x):
         """_summary_
         Args:
