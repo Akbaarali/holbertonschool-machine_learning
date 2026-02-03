@@ -9,12 +9,7 @@ class Binomial:
 
     def __init__(self, data=None, n=1, p=0.5):
         """
-        Initializes a Binomial distribution.
-
-        Args:
-            data (list): list of data to estimate n and p
-            n (int): number of Bernoulli trials
-            p (float): probability of success
+        Creates a Binomial distribution
         """
         if data is None:
             if n <= 0:
@@ -43,25 +38,15 @@ class Binomial:
 
     def pmf(self, k):
         """
-        Calculates the value of the PMF
-        Args:
-            k (int): number of "successes"
-        Returns:
-            float: PMF value for k
+        Returns the probability mass for k successes
         """
-        # if k is not an integer, convert it to an integer
         k = int(k)
 
-        # if k is out of range, return 0
         if k < 0 or k > self.n:
             return 0
 
-        # Compute nCk without imports:
-        # nCk = n! / (k!(n-k)!)
-        # Use multiplicative formula to avoid huge factorials.
         n = self.n
 
-        # symmetry to reduce loops
         if k > n - k:
             k = n - k
 
@@ -70,4 +55,5 @@ class Binomial:
         while i <= k:
             comb = comb * (n - k + i) / i
             i += 1
+
         return comb * (self.p ** k) * ((1 - self.p) ** (n - k))
