@@ -51,27 +51,30 @@ class Normal:
         return coef * expo
 
     def cdf(self, x):
-        """CDF at x."""
-        e = 2.7182818285
+        """
+        Calculates cumilative distribution
+        """
+        if x is None:
+            return None
 
-        sqrt2 = 2 ** 0.5
-        t = (x - self.mean) / (self.stddev * sqrt2)
+        if not isinstance (x, (int, float)):
+            return None
 
-        sign = 1
-        if t < 0:
+        z = (x - self.mean) / (self.stddev * (2 ** 0.5))
+        sign  = 1
+        if z < 0:
             sign = -1
-            t = -t
-
+            z = -z
         a1 = 0.254829592
         a2 = -0.284496736
         a3 = 1.421413741
         a4 = -1.453152027
         a5 = 1.061405429
         p = 0.3275911
+        t = 1.0 / (1.0 + p * z)
+        e_const = 2.718281828459045
+        exp_term = e_const ** (-(z * z))
 
-        u = 1.0 / (1.0 + p * t)
-        poly = (((((a5 * u + a4) * u + a3) * u + a2) * u + a1) * u)
-        erf_val = 1.0 - poly * (e ** (-(t * t)))
-        erf_val *= sign
-
-        return 0.5 * (1.0 + erf_val)
+        erf_approx = 1.0 - (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t) * exp_term
+        erf_approx *= sign
+        return 0.5 * (1.0 + erf_approx)
