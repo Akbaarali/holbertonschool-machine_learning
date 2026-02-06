@@ -40,13 +40,13 @@ class Binomial:
             return 0
         fact_n = 1
         fact_k = 1
-        fact_n-k = 1
+        fact_nk = 1
         for i in range (1, n + 1):
             fact_n *= i
         for j in range (1, k + 1):
             fact_k *= j
         for l in range (1, n - k + 1):
-            fact_n-k *= l
+            fact_nk *= l
         
-        result = fact_n / (fact_k * fact_n-k)
+        result = fact_n / (fact_k * fact_nk)
         return result
