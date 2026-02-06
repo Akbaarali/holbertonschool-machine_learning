@@ -32,17 +32,21 @@ class Binomial:
             self.n = int(n_est)
             self.p = float(p_est)
 
-    def fact(self, x):
-        fact = 1
-        for i in range(x+1):
-            fact *= i
-        return fact
-
     def pmf(self, k):
         """PMF for k successes."""
         if not isinstance(k, int):
             self.k = int(k)
         if k < 0 or k > self.n:
             return 0
-        result = (fact(n)) / (fact (k)) * (fact(n - k))
+        fact_n = 1
+        fact_k = 1
+        fact_n-k = 1
+        for i in range (1, n + 1):
+            fact_n *= i
+        for j in range (1, k + 1):
+            fact_k *= j
+        for l in range (1, n - k + 1):
+            fact_n-k *= l
+        
+        result = fact_n / (fact_k * fact_n-k)
         return result
