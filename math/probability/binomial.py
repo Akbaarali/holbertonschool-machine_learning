@@ -41,11 +41,11 @@ class Binomial:
         fact_n = 1
         fact_k = 1
         fact_nk = 1
-        for i in range (1, n + 1):
+        for i in range (1, self.n + 1):
             fact_n *= i
-        for j in range (1, k + 1):
+        for j in range (1, self.k + 1):
             fact_k *= j
-        for l in range (1, n - k + 1):
+        for l in range (1, self.n - self.k + 1):
             fact_nk *= l
         
         result = fact_n / (fact_k * fact_nk)
