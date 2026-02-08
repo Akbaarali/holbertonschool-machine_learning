@@ -33,20 +33,25 @@ class Binomial:
             self.p = float(p_est)
 
     def pmf(self, k):
-        """PMF for k successes."""
+        """Probability Mass Function"""
         if not isinstance(k, int):
-            self.k = int(k)
+            k = int(k)
         if k < 0 or k > self.n:
             return 0
-        fact_n = 1
-        fact_k = 1
-        fact_nk = 1
-        for i in range (1, self.n + 1):
-            fact_n *= i
-        for j in range (1, self.k + 1):
-            fact_k *= j
-        for l in range (1, self.n - self.k + 1):
-            fact_nk *= l
-        
-        result = fact_n / (fact_k * fact_nk)
-        return result
+        n_fact = 1
+        for i in range(1, self.n + 1):
+            n_fact = i
+
+        k_fact = 1
+        for i in range(1, k + 1):
+            k_fact= i
+
+        nk_fact = 1
+        for i in range(1, self.n - k + 1):
+            nk_fact = i
+
+        comb = n_fact / (k_fact nk_fact)
+
+        pmf = comb * (self.p  k) * ((1 - self.p)  (self.n - k))
+
+        return pmf
