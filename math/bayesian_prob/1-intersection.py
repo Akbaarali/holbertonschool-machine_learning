@@ -8,7 +8,8 @@ import numpy as np
 
 def intersection(x, n, P, Pr):
     """
-    Calculates the intersection of obtaining x and n with each probability in P.
+    Calculates the intersection of obtaining x and n with each probability
+    in P.
 
     Args:
         x (int): number of patients that develop severe side effects
