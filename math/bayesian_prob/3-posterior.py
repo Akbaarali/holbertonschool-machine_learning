@@ -8,7 +8,8 @@ import numpy as np
 
 def posterior(x, n, P, Pr):
     """
-    Calculates the posterior probability for each probability in P given x and n.
+    Calculates the posterior probability for each probability in P given
+    x and n.
 
     Args:
         x (int): number of patients that develop severe side effects
