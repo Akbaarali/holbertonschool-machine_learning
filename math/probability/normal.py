@@ -1,54 +1,54 @@
 #!/usr/bin/env python3
-"""
-Normal distribution
-"""
+"""Probability"""
+pi = 3.1415926536
+e = 2.7182818285
 
 
 class Normal:
-    """Normal distribution"""
-
+    """Normal Class"""
     def __init__(self, data=None, mean=0., stddev=1.):
-        """Create a Normal distribution."""
-        if data is None:
-            if stddev <= 0:
-                raise ValueError("stddev must be a positive value")
-            self.mean = float(mean)
-            self.stddev = float(stddev)
-        else:
+        """Initiailize Function"""
+        if data is not None:
             if not isinstance(data, list):
                 raise TypeError("data must be a list")
             if len(data) < 2:
                 raise ValueError("data must contain multiple values")
-
-            n = len(data)
-            mu = sum(data) / n
-
-            # population variance: divide by n (NOT n - 1)
-            var = 0
-            for x in data:
-                var += (x - mu) ** 2
-            var = var / n
-
-            self.mean = float(mu)
-            self.stddev = float(var ** 0.5)
+            self.mean = sum(data) / len(data)
+            var = sum((x - self.mean) ** 2 for x in data)
+            self.stddev = (var / len(data)) ** 0.5
+        else:
+            if stddev <= 0:
+                raise ValueError("stddev must be a positive value")
+            self.mean = float(mean)
+            self.stddev = float(stddev)
 
     def z_score(self, x):
-        """z-score of x."""
-        return (x - self.mean) / self.stddev
+        """Z_Score Function"""
+        z_score = (x - self.mean) / self.stddev
+        return z_score
 
     def x_value(self, z):
-        """x-value of z."""
-        return z * self.stddev + self.mean
+        """X_Value Function"""
+        x_value = self.mean + z * self.stddev
+        return x_value
 
     def pdf(self, x):
-        """PDF at x."""
+        """Probability Density Function"""
         pi = 3.1415926536
         e = 2.7182818285
+        part1 = 1 / (self.stddev * (2 * pi) ** 0.5)
+        part2 = e ** (-0.5 * ((x - self.mean) / self.stddev) ** 2)
+        pdf = part1 * part2
 
-        z = (x - self.mean) / self.stddev
-        coef = 1 / (self.stddev * ((2 * pi) ** 0.5))
-        expo = e ** (-(z ** 2) / 2)
-        return coef * expo
+        return pdf
+
+    @staticmethod
+    def erf(x):
+        return ((2 / (pi) ** 0.5) *
+                (x - (x ** 3) / 3 +
+                 (x ** 5) / 10 -
+                 (x ** 7) / 42 +
+                 (x ** 9) / 216))
 
     def cdf(self, x):
         """Cumulative Distribution Function"""
