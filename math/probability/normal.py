@@ -51,18 +51,8 @@ class Normal:
         return coef * expo
 
     def cdf(self, x):
-        """
-        Calculates cumilative distribution
-        """
-        z = (x - self.mean) / (self.stddev * (2 ** 0.5))
-        pi = 3.1415926536
-        two_over_sqrt_pi = 2 / (pi ** 0.5)
-        term = z
-        series_sum = term
+        """Cumulative Distribution Function"""
+        part1 = (x - self.mean) / (self.stddev * (2 ** 0.5))
+        cdf = 1 / 2 * (1 + self.erf(part1))
 
-        for n in range (0, 49):
-            term *= (-1) * (z * z) * (2 * n + 1) / ((n+1) * (2 * n + 3))
-            series_sum += term
-
-        erf = two_over_sqrt_pi * series_sum
-        return 0.5 * (1 + erf)
+        return cdf
