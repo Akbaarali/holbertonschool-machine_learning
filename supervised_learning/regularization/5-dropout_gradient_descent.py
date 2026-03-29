@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """Comment of Function"""
 import numpy as np
