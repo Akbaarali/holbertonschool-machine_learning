@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """Classification algorithm using Deep Neural Network (DNN class)."""
 import numpy as np
