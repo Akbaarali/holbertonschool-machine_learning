@@ -99,7 +99,3 @@ Dropout → randomizes learning
 Data Augmentation → increases data
 Early Stopping → stops before overfitting
 In practice, combining multiple techniques often gives the best results.
-
-
-Final Thoughts
-If you can’t explain something simply, you don’t fully understand it. Regularization is not complicated — it’s just about helping models generalize better instead of memorizing.
