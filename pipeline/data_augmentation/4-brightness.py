@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Adjust image brightness randomly"""
+"""Change image brightness"""
 
 import tensorflow as tf
 
 
-def change_brightness(image):
-    """Adjusts the brightness of an image randomly"""
-    return tf.image.random_brightness(image, max_delta=0.2)
+def change_brightness(image, max_delta):
+    """Randomly changes the brightness of an image"""
+    return tf.image.random_brightness(image, max_delta)
