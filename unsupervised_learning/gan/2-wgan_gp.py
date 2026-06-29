@@ -1,4 +1,3 @@
-cat > 2-wgan_gp.py <<'PY'
 #!/usr/bin/env python3
 """Wasserstein GAN with gradient penalty."""
 
@@ -16,7 +15,7 @@ class WGAN_GP(keras.Model):
         super().__init__()
 
         self.latent_generator = latent_generator
-        self.real_examples = real_examples
+        self.real_examples = tf.cast(real_examples, tf.float32)
         self.generator = generator
         self.discriminator = discriminator
         self.batch_size = batch_size
@@ -29,12 +28,11 @@ class WGAN_GP(keras.Model):
         self.lambda_gp = lambda_gp
         self.dims = self.real_examples.shape
         self.len_dims = len(self.dims)
-        self.axis = tf.range(1, self.len_dims, delta=1, dtype="int32")
+        self.axis = list(range(1, self.len_dims))
 
         self.scal_shape = [self.batch_size]
         for _ in range(1, self.len_dims):
             self.scal_shape.append(1)
-        self.scal_shape = tf.convert_to_tensor(self.scal_shape)
 
         self.generator.loss = lambda x: -tf.math.reduce_mean(x)
         self.generator.optimizer = keras.optimizers.Adam(
@@ -66,7 +64,9 @@ class WGAN_GP(keras.Model):
             size = self.batch_size
 
         latent_sample = self.latent_generator(size)
-        return self.generator(latent_sample, training=training)
+        fake_sample = self.generator(latent_sample, training=training)
+
+        return tf.cast(fake_sample, tf.float32)
 
     def get_real_sample(self, size=None):
         """Get random real samples."""
@@ -80,7 +80,14 @@ class WGAN_GP(keras.Model):
 
     def get_interpolated_sample(self, real_sample, fake_sample):
         """Create interpolated samples between real and fake samples."""
-        alpha = tf.random.uniform(self.scal_shape)
+        real_sample = tf.cast(real_sample, tf.float32)
+        fake_sample = tf.cast(fake_sample, tf.float32)
+
+        shape = [tf.shape(real_sample)[0]]
+        for _ in range(1, self.len_dims):
+            shape.append(1)
+
+        alpha = tf.random.uniform(shape, dtype=tf.float32)
 
         return alpha * real_sample + (1 - alpha) * fake_sample
 
@@ -95,9 +102,9 @@ class WGAN_GP(keras.Model):
 
         gradients = tape.gradient(prediction, interpolated_sample)
         norm = tf.sqrt(tf.reduce_sum(tf.square(gradients), axis=self.axis))
-        penalty = tf.reduce_mean((norm - 1) ** 2)
+        gp = tf.reduce_mean((norm - 1) ** 2)
 
-        return penalty
+        return gp
 
     def train_step(self, useless_argument):
         """Perform one WGAN-GP training step."""
@@ -148,4 +155,3 @@ class WGAN_GP(keras.Model):
             "gen_loss": gen_loss,
             "gp": gp
         }
-PY
