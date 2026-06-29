@@ -6,7 +6,7 @@ from tensorflow import keras
 
 
 class WGAN_clip(keras.Model):
-    """Wasserstein GAN with clipped discriminator weights."""
+    """WGAN with clipped discriminator weights."""
 
     def __init__(self, generator, discriminator, latent_generator,
                  real_examples, batch_size=200, disc_iter=2,
@@ -37,7 +37,7 @@ class WGAN_clip(keras.Model):
         )
 
         self.discriminator.loss = lambda x, y: (
-            tf.math.reduce_mean(y) - tf.math.reduce_mean(x)
+            tf.math.reduce_mean(x) - tf.math.reduce_mean(y)
         )
         self.discriminator.optimizer = keras.optimizers.Adam(
             learning_rate=self.learning_rate,
@@ -89,8 +89,8 @@ class WGAN_clip(keras.Model):
                 zip(gradients, self.discriminator.trainable_variables)
             )
 
-            for weight in self.discriminator.trainable_variables:
-                weight.assign(tf.clip_by_value(weight, -1, 1))
+            for var in self.discriminator.trainable_variables:
+                var.assign(tf.clip_by_value(var, -1, 1))
 
         with tf.GradientTape() as tape:
             fake_sample = self.get_fake_sample(training=True)
