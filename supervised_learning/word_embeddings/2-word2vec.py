@@ -17,7 +17,7 @@ def word2vec_model(sentences, vector_size=100, min_count=5, window=5,
         negative: size of negative sampling
         cbow: True for CBOW, False for Skip-gram
         epochs: number of iterations to train over
-        seed: seed for random number generator
+        seed: seed for the random number generator
         workers: number of worker threads
 
     Returns:
@@ -25,31 +25,17 @@ def word2vec_model(sentences, vector_size=100, min_count=5, window=5,
     """
     sg = 0 if cbow else 1
 
-    try:
-        model = gensim.models.Word2Vec(
-            sentences=sentences,
-            vector_size=vector_size,
-            min_count=min_count,
-            window=window,
-            negative=negative,
-            sg=sg,
-            epochs=epochs,
-            seed=seed,
-            workers=workers,
-            sorted_vocab=0
-        )
-    except TypeError:
-        model = gensim.models.Word2Vec(
-            sentences=sentences,
-            size=vector_size,
-            min_count=min_count,
-            window=window,
-            negative=negative,
-            sg=sg,
-            iter=epochs,
-            seed=seed,
-            workers=workers,
-            sorted_vocab=0
-        )
+    model = gensim.models.Word2Vec(
+        vector_size=vector_size,
+        min_count=min_count,
+        window=window,
+        negative=negative,
+        sg=sg,
+        seed=seed,
+        workers=workers,
+        sorted_vocab=0
+    )
+
+    model.build_vocab(sentences)
 
     return model
