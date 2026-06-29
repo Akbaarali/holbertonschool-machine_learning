@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
-"""0-simple_gan.py - Simple GAN implementation"""
+"""Simple GAN model."""
+
 import tensorflow as tf
 from tensorflow import keras
-import numpy as np
+
 
 class Simple_GAN(keras.Model):
-    """Simple_GAN"""
+    """Simple GAN class."""
 
     def __init__(self, generator, discriminator, latent_generator,
                  real_examples, batch_size=200, disc_iter=2,
-                 learning_rate=.001):
-        """__init__"""
+                 learning_rate=.005):
+        """Initialize the Simple GAN."""
         super().__init__()
+
         self.latent_generator = latent_generator
         self.real_examples = real_examples
         self.generator = generator
@@ -20,67 +22,90 @@ class Simple_GAN(keras.Model):
         self.disc_iter = disc_iter
         self.learning_rate = learning_rate
 
+        self.beta_1 = .5
+        self.beta_2 = .9
+
+        self.generator.loss = lambda x: tf.keras.losses.MeanSquaredError()(
+            x, tf.ones_like(x)
+        )
+        self.generator.optimizer = keras.optimizers.Adam(
+            learning_rate=self.learning_rate,
+            beta_1=self.beta_1,
+            beta_2=self.beta_2
+        )
         self.generator.compile(
-            optimizer=keras.optimizers.Adam(learning_rate=learning_rate)
+            optimizer=self.generator.optimizer,
+            loss=self.generator.loss
+        )
+
+        self.discriminator.loss = lambda x, y: (
+            tf.keras.losses.MeanSquaredError()(x, tf.ones_like(x)) +
+            tf.keras.losses.MeanSquaredError()(y, -tf.ones_like(y))
+        )
+        self.discriminator.optimizer = keras.optimizers.Adam(
+            learning_rate=self.learning_rate,
+            beta_1=self.beta_1,
+            beta_2=self.beta_2
         )
         self.discriminator.compile(
-            optimizer=keras.optimizers.Adam(learning_rate=learning_rate)
+            optimizer=self.discriminator.optimizer,
+            loss=self.discriminator.loss
         )
 
     def get_fake_sample(self, size=None, training=False):
-        """get_fake_sample"""
-        if not size:
+        """Generate fake samples."""
+        if size is None:
             size = self.batch_size
+
         latent_sample = self.latent_generator(size)
         return self.generator(latent_sample, training=training)
 
     def get_real_sample(self, size=None):
-        """get_real_sample"""
-        if not size:
+        """Get random real samples."""
+        if size is None:
             size = self.batch_size
-        indices = tf.random.uniform(
-            shape=(size,),
-            minval=0,
-            maxval=tf.shape(self.real_examples)[0],
-            dtype=tf.int32
-        )
+
+        indices = tf.range(tf.shape(self.real_examples)[0])
+        indices = tf.random.shuffle(indices)[:size]
+
         return tf.gather(self.real_examples, indices)
 
     def train_step(self, useless_argument):
-        """train_step"""
+        """Perform one training step."""
         for _ in range(self.disc_iter):
-            real_sample = self.get_real_sample()
-            fake_sample = self.get_fake_sample(training=True)
-
             with tf.GradientTape() as tape:
-                discr_real = self.discriminator(real_sample, training=True)
-                discr_fake = self.discriminator(fake_sample, training=True)
-                discr_loss = tf.keras.losses.MeanSquaredError()(discr_real, tf.ones_like(discr_real)) + \
-                             tf.keras.losses.MeanSquaredError()(discr_fake, -tf.ones_like(discr_fake))
+                real_sample = self.get_real_sample()
+                fake_sample = self.get_fake_sample(training=False)
 
-            grads = tape.gradient(discr_loss, self.discriminator.trainable_variables)
+                real_output = self.discriminator(real_sample, training=True)
+                fake_output = self.discriminator(fake_sample, training=True)
+
+                discr_loss = self.discriminator.loss(
+                    real_output, fake_output
+                )
+
+            gradients = tape.gradient(
+                discr_loss,
+                self.discriminator.trainable_variables
+            )
             self.discriminator.optimizer.apply_gradients(
-                zip(grads, self.discriminator.trainable_variables)
+                zip(gradients, self.discriminator.trainable_variables)
             )
 
         with tf.GradientTape() as tape:
             fake_sample = self.get_fake_sample(training=True)
-            discr_fake = self.discriminator(fake_sample, training=False)
-            gen_loss = tf.keras.losses.MeanSquaredError()(discr_fake, tf.ones_like(discr_fake))
+            fake_output = self.discriminator(fake_sample, training=False)
+            gen_loss = self.generator.loss(fake_output)
 
-        grads = tape.gradient(gen_loss, self.generator.trainable_variables)
+        gradients = tape.gradient(
+            gen_loss,
+            self.generator.trainable_variables
+        )
         self.generator.optimizer.apply_gradients(
-            zip(grads, self.generator.trainable_variables)
+            zip(gradients, self.generator.trainable_variables)
         )
 
-        return {"discr_loss": discr_loss, "gen_loss": gen_loss}
-
-def compare_losses(list1, list2, threshold=0.1):
-    """compare_losses"""
-    for i in range(len(list1)):
-        if np.all(list1[i] == 0):
-            continue
-        diff = np.abs(np.array(list1[i]) - np.array(list2[i]))
-        if np.any(diff > threshold):
-            return False
-    return True
+        return {
+            "discr_loss": discr_loss,
+            "gen_loss": gen_loss
+        }
