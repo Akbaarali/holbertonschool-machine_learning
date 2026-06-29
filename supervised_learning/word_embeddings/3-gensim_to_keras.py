@@ -1,41 +1,28 @@
+cat > 3-gensim_to_keras.py <<'PY'
 #!/usr/bin/env python3
-"""Train Word2Vec model."""
+"""Converts a gensim Word2Vec model to a Keras Embedding layer."""
 
-import gensim
+import tensorflow as tf
 
 
-def word2vec_model(sentences, vector_size=100, min_count=5, window=5,
-                   negative=5, cbow=True, epochs=5, seed=0, workers=1):
+def gensim_to_keras(model):
     """
-    Creates, builds, and trains a gensim Word2Vec model.
+    Converts a gensim Word2Vec model to a trainable Keras Embedding layer.
 
     Args:
-        sentences: list of sentences to be trained on
-        vector_size: dimensionality of the embedding layer
-        min_count: minimum number of occurrences of a word for training
-        window: maximum distance between current and predicted word
-        negative: size of negative sampling
-        cbow: True for CBOW, False for Skip-gram
-        epochs: number of iterations to train over
-        seed: seed for the random number generator
-        workers: number of worker threads
+        model: trained gensim Word2Vec model
 
     Returns:
-        The trained model
+        A trainable Keras Embedding layer
     """
-    sg = 0 if cbow else 1
+    weights = model.wv.vectors
 
-    model = gensim.models.Word2Vec(
-        vector_size=vector_size,
-        min_count=min_count,
-        window=window,
-        negative=negative,
-        sg=sg,
-        seed=seed,
-        workers=workers,
-        sorted_vocab=1
+    embedding = tf.keras.layers.Embedding(
+        input_dim=weights.shape[0],
+        output_dim=weights.shape[1],
+        weights=[weights],
+        trainable=True
     )
 
-    model.build_vocab(sentences)
-
-    return model
+    return embedding
+PY
