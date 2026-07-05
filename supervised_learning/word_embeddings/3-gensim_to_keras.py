@@ -1,28 +1,19 @@
-cat > 3-gensim_to_keras.py <<'PY'
 #!/usr/bin/env python3
-"""Converts a gensim Word2Vec model to a Keras Embedding layer."""
-
+"""Comment of Function"""
 import tensorflow as tf
 
 
 def gensim_to_keras(model):
-    """
-    Converts a gensim Word2Vec model to a trainable Keras Embedding layer.
+    """Convert gensim word2vec to keras Embedding"""
+    embedding_matrix = model.wv.vectors
 
-    Args:
-        model: trained gensim Word2Vec model
+    vocab_size, embedding_dim = embedding_matrix.shape
 
-    Returns:
-        A trainable Keras Embedding layer
-    """
-    weights = model.wv.vectors
-
-    embedding = tf.keras.layers.Embedding(
-        input_dim=weights.shape[0],
-        output_dim=weights.shape[1],
-        weights=[weights],
+    layer = tf.keras.layers.Embedding(
+        input_dim=vocab_size,
+        output_dim=embedding_dim,
+        weights=[embedding_matrix],
         trainable=True
     )
 
-    return embedding
-PY
+    return layer
