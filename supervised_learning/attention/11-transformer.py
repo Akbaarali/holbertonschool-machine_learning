@@ -35,7 +35,9 @@ class Transformer(tf.keras.Model):
             drop_rate
         )
 
-        self.linear = tf.keras.layers.Dense(target_vocab)
+        self.linear = tf.keras.layers.Dense(
+            target_vocab
+        )
 
     def call(self, inputs, target, training, encoder_mask,
              look_ahead_mask, decoder_mask):
@@ -54,6 +56,8 @@ class Transformer(tf.keras.Model):
             padding_mask=decoder_mask
         )
 
-        output = self.linear(decoder_output)
+        output = self.linear(
+            decoder_output
+        )
 
         return output
