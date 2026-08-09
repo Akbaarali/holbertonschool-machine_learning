@@ -3,8 +3,6 @@
 
 import tensorflow as tf
 from tensorflow import keras
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 class Simple_GAN(keras.Model):
@@ -29,7 +27,8 @@ class Simple_GAN(keras.Model):
 
         self.generator.loss = lambda x: (
             tf.keras.losses.MeanSquaredError()(
-                x, tf.ones(x.shape)
+                x,
+                tf.ones(x.shape)
             )
         )
 
@@ -46,11 +45,13 @@ class Simple_GAN(keras.Model):
 
         self.discriminator.loss = lambda x, y: (
             tf.keras.losses.MeanSquaredError()(
-                x, tf.ones(x.shape)
+                x,
+                tf.ones(x.shape)
             )
             +
             tf.keras.losses.MeanSquaredError()(
-                y, -1 * tf.ones(y.shape)
+                y,
+                -1 * tf.ones(y.shape)
             )
         )
 
@@ -65,39 +66,37 @@ class Simple_GAN(keras.Model):
             loss=self.discriminator.loss
         )
 
-def get_real_sample(self, size=None):
-    """Return a random sample of real examples."""
-    if size is None:
-        size = self.batch_size
+    def get_real_sample(self, size=None):
+        """Return a random sample of real examples."""
+        if size is None:
+            size = self.batch_size
 
-    sorted_indices = tf.range(
-        tf.shape(self.real_examples)[0]
-    )
+        sorted_indices = tf.range(
+            tf.shape(self.real_examples)[0]
+        )
 
-    random_indices = tf.random.shuffle(
-        sorted_indices
-    )[:size]
+        random_indices = tf.random.shuffle(
+            sorted_indices
+        )[:size]
 
-    return tf.gather(
-        self.real_examples,
-        random_indices
-    )
+        return tf.gather(
+            self.real_examples,
+            random_indices
+        )
 
-def get_fake_sample(self, size=None, training=False):
-    """Return a generated sample of fake examples."""
-    if size is None:
-        size = self.batch_size
+    def get_fake_sample(self, size=None, training=False):
+        """Return a generated sample of fake examples."""
+        if size is None:
+            size = self.batch_size
 
-    return self.generator(
-        self.latent_generator(size),
-        training=training
-    )
+        return self.generator(
+            self.latent_generator(size),
+            training=training
+        )
 
     def train_step(self, useless_argument):
         """Perform one training step for the GAN."""
-
         for _ in range(self.disc_iter):
-
             with tf.GradientTape() as tape:
                 real_sample = self.get_real_sample()
                 fake_sample = self.get_fake_sample()
@@ -130,7 +129,6 @@ def get_fake_sample(self, size=None, training=False):
             )
 
         with tf.GradientTape() as tape:
-
             fake_sample = self.get_fake_sample(
                 training=True
             )
