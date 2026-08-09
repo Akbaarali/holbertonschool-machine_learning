@@ -1,67 +1,89 @@
 #!/usr/bin/env python3
-"""Transformer Encoder."""
+"""Transformer decoder block module."""
 
 import tensorflow as tf
 
-positional_encoding = __import__('4-positional_encoding').positional_encoding
-EncoderBlock = __import__('7-transformer_encoder_block').EncoderBlock
+MultiHeadAttention = __import__('6-multihead_attention').MultiHeadAttention
 
 
-class Encoder(tf.keras.layers.Layer):
-    """Transformer Encoder."""
+class DecoderBlock(tf.keras.layers.Layer):
+    """Decoder block for a Transformer."""
 
-    def __init__(self, N, dm, h, hidden, input_vocab,
-                 max_seq_len, drop_rate=0.1):
-        """Initialize the Transformer Encoder."""
-        super(Encoder, self).__init__()
+    def __init__(self, dm, h, hidden, drop_rate=0.1):
+        """Initialize the Transformer decoder block."""
+        super(DecoderBlock, self).__init__()
 
-        self.dm = dm
-        self.N = N
+        self.mha1 = MultiHeadAttention(dm, h)
+        self.mha2 = MultiHeadAttention(dm, h)
 
-        self.embedding = tf.keras.layers.Embedding(
-            input_vocab,
-            dm
+        self.dense_hidden = tf.keras.layers.Dense(
+            hidden,
+            activation='relu'
         )
 
-        self.positional_encoding = positional_encoding(
-            max_seq_len,
-            dm
+        self.dense_output = tf.keras.layers.Dense(dm)
+
+        self.layernorm1 = tf.keras.layers.LayerNormalization(
+            epsilon=1e-6
         )
 
-        self.blocks = [
-            EncoderBlock(
-                dm,
-                h,
-                hidden,
-                drop_rate
-            )
-            for _ in range(N)
-        ]
-
-        self.dropout = tf.keras.layers.Dropout(drop_rate)
-
-    def call(self, x, training, mask=None):
-        """Perform the forward pass through the encoder."""
-        seq_len = tf.shape(x)[1]
-
-        x = self.embedding(x)
-
-        x *= tf.math.sqrt(
-            tf.cast(self.dm, tf.float32)
+        self.layernorm2 = tf.keras.layers.LayerNormalization(
+            epsilon=1e-6
         )
 
-        x += self.positional_encoding[:seq_len]
+        self.layernorm3 = tf.keras.layers.LayerNormalization(
+            epsilon=1e-6
+        )
 
-        x = self.dropout(
+        self.dropout1 = tf.keras.layers.Dropout(drop_rate)
+        self.dropout2 = tf.keras.layers.Dropout(drop_rate)
+        self.dropout3 = tf.keras.layers.Dropout(drop_rate)
+
+    def call(self, x, encoder_output, training,
+             look_ahead_mask=None, padding_mask=None):
+        """Perform the forward pass through the decoder block."""
+        attention1, _ = self.mha1(
             x,
+            x,
+            x,
+            look_ahead_mask
+        )
+
+        attention1 = self.dropout1(
+            attention1,
             training=training
         )
 
-        for i in range(self.N):
-            x = self.blocks[i](
-                x,
-                training,
-                mask
-            )
+        out1 = self.layernorm1(
+            x + attention1
+        )
 
-        return x
+        attention2, _ = self.mha2(
+            out1,
+            encoder_output,
+            encoder_output,
+            padding_mask
+        )
+
+        attention2 = self.dropout2(
+            attention2,
+            training=training
+        )
+
+        out2 = self.layernorm2(
+            out1 + attention2
+        )
+
+        ffn_output = self.dense_hidden(out2)
+        ffn_output = self.dense_output(ffn_output)
+
+        ffn_output = self.dropout3(
+            ffn_output,
+            training=training
+        )
+
+        out3 = self.layernorm3(
+            out2 + ffn_output
+        )
+
+        return out3
