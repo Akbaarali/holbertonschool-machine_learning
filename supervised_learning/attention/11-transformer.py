@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Transformer network."""
+"""Transformer network module."""
 
 import tensorflow as tf
 
@@ -42,16 +42,16 @@ class Transformer(tf.keras.Model):
         """Perform the forward pass through the Transformer."""
         encoder_output = self.encoder(
             inputs,
-            training,
-            encoder_mask
+            training=training,
+            mask=encoder_mask
         )
 
         decoder_output = self.decoder(
             target,
             encoder_output,
-            training,
-            look_ahead_mask,
-            decoder_mask
+            training=training,
+            look_ahead_mask=look_ahead_mask,
+            padding_mask=decoder_mask
         )
 
         output = self.linear(decoder_output)
