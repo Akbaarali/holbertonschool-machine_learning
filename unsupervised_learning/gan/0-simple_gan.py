@@ -65,27 +65,33 @@ class Simple_GAN(keras.Model):
             loss=self.discriminator.loss
         )
 
-    def get_real_sample(self):
-        """Return a random batch of real examples."""
-        sorted_indices = tf.range(
-            tf.shape(self.real_examples)[0]
-        )
+def get_real_sample(self, size=None):
+    """Return a random sample of real examples."""
+    if size is None:
+        size = self.batch_size
 
-        random_indices = tf.random.shuffle(
-            sorted_indices
-        )[:self.batch_size]
+    sorted_indices = tf.range(
+        tf.shape(self.real_examples)[0]
+    )
 
-        return tf.gather(
-            self.real_examples,
-            random_indices
-        )
+    random_indices = tf.random.shuffle(
+        sorted_indices
+    )[:size]
 
-    def get_fake_sample(self, training=False):
-        """Return a generated batch of fake examples."""
-        return self.generator(
-            self.latent_generator(self.batch_size),
-            training=training
-        )
+    return tf.gather(
+        self.real_examples,
+        random_indices
+    )
+
+def get_fake_sample(self, size=None, training=False):
+    """Return a generated sample of fake examples."""
+    if size is None:
+        size = self.batch_size
+
+    return self.generator(
+        self.latent_generator(size),
+        training=training
+    )
 
     def train_step(self, useless_argument):
         """Perform one training step for the GAN."""
