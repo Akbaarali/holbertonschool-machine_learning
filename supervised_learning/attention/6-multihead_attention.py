@@ -1,85 +1,69 @@
 #!/usr/bin/env python3
-"""Transformer Encoder Block."""
+"""Multi-head attention module."""
 
 import tensorflow as tf
 
-MultiHeadAttention = __import__(
-    '6-multihead_attention'
-).MultiHeadAttention
+sdp_attention = __import__('5-sdp_attention').sdp_attention
 
 
-class EncoderBlock(tf.keras.layers.Layer):
-    """Encoder block for a Transformer."""
+class MultiHeadAttention(tf.keras.layers.Layer):
+    """Multi-head attention layer."""
 
-    def __init__(self, dm, h, hidden, drop_rate=0.1):
-        """
-        Initialize the Transformer encoder block.
+    def __init__(self, dm, h):
+        """Initialize multi-head attention."""
+        super(MultiHeadAttention, self).__init__()
 
-        Args:
-            dm: Dimensionality of the model.
-            h: Number of attention heads.
-            hidden: Number of hidden units in the feed-forward layer.
-            drop_rate: Dropout rate.
-        """
-        super(EncoderBlock, self).__init__()
+        self.h = h
+        self.dm = dm
+        self.depth = dm // h
 
-        self.mha = MultiHeadAttention(dm, h)
+        self.Wq = tf.keras.layers.Dense(dm)
+        self.Wk = tf.keras.layers.Dense(dm)
+        self.Wv = tf.keras.layers.Dense(dm)
 
-        self.dense_hidden = tf.keras.layers.Dense(
-            hidden,
-            activation='relu'
+        self.linear = tf.keras.layers.Dense(dm)
+
+    def split_heads(self, x, batch_size):
+        """Split the last dimension into multiple heads."""
+        x = tf.reshape(
+            x,
+            (batch_size, -1, self.h, self.depth)
         )
 
-        self.dense_output = tf.keras.layers.Dense(dm)
-
-        self.layernorm1 = tf.keras.layers.LayerNormalization(
-            epsilon=1e-6
+        return tf.transpose(
+            x,
+            perm=[0, 2, 1, 3]
         )
 
-        self.layernorm2 = tf.keras.layers.LayerNormalization(
-            epsilon=1e-6
-        )
+    def call(self, Q, K, V, mask):
+        """Perform multi-head attention."""
+        batch_size = tf.shape(Q)[0]
 
-        self.dropout1 = tf.keras.layers.Dropout(drop_rate)
-        self.dropout2 = tf.keras.layers.Dropout(drop_rate)
+        Q = self.Wq(Q)
+        K = self.Wk(K)
+        V = self.Wv(V)
 
-    def call(self, x, training, mask=None):
-        """
-        Perform the forward pass of the encoder block.
+        Q = self.split_heads(Q, batch_size)
+        K = self.split_heads(K, batch_size)
+        V = self.split_heads(V, batch_size)
 
-        Args:
-            x: Tensor of shape (batch, input_seq_len, dm).
-            training: Boolean indicating whether the model is training.
-            mask: Mask applied to multi-head attention.
-
-        Returns:
-            Tensor of shape (batch, input_seq_len, dm).
-        """
-        attention, _ = self.mha(
-            x,
-            x,
-            x,
+        scaled_attention, weights = sdp_attention(
+            Q,
+            K,
+            V,
             mask
         )
 
-        attention = self.dropout1(
-            attention,
-            training=training
+        scaled_attention = tf.transpose(
+            scaled_attention,
+            perm=[0, 2, 1, 3]
         )
 
-        out1 = self.layernorm1(
-            x + attention
+        concat_attention = tf.reshape(
+            scaled_attention,
+            (batch_size, -1, self.dm)
         )
 
-        hidden = self.dense_hidden(out1)
+        output = self.linear(concat_attention)
 
-        output = self.dense_output(hidden)
-
-        output = self.dropout2(
-            output,
-            training=training
-        )
-
-        return self.layernorm2(
-            out1 + output
-        )
+        return output, weights
