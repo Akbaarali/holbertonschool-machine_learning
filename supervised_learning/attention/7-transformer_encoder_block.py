@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Transformer encoder block."""
+"""Transformer encoder block module."""
 
 import tensorflow as tf
 
@@ -7,10 +7,10 @@ MultiHeadAttention = __import__('6-multihead_attention').MultiHeadAttention
 
 
 class EncoderBlock(tf.keras.layers.Layer):
-    """Transformer encoder block."""
+    """Encoder block for a Transformer."""
 
     def __init__(self, dm, h, hidden, drop_rate=0.1):
-        """Initialize the encoder block."""
+        """Initialize the Transformer encoder block."""
         super(EncoderBlock, self).__init__()
 
         self.mha = MultiHeadAttention(dm, h)
@@ -34,15 +34,22 @@ class EncoderBlock(tf.keras.layers.Layer):
         self.dropout2 = tf.keras.layers.Dropout(drop_rate)
 
     def call(self, x, training, mask=None):
-        """Perform the forward pass of the encoder block."""
-        attention, _ = self.mha(x, x, x, mask)
+        """Perform the forward pass through the encoder block."""
+        attention, _ = self.mha(
+            x,
+            x,
+            x,
+            mask
+        )
 
         attention = self.dropout1(
             attention,
             training=training
         )
 
-        out1 = self.layernorm1(x + attention)
+        out1 = self.layernorm1(
+            x + attention
+        )
 
         ffn_output = self.dense_hidden(out1)
         ffn_output = self.dense_output(ffn_output)
